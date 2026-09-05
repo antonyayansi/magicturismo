@@ -53,7 +53,7 @@ class MenuItem extends Model
 
     public static function forLocation(string $ubicacion)
     {
-        if (! \Illuminate\Support\Facades\Schema::hasTable((new static)->getTable())) {
+        if (! \App\Support\SchemaCache::hasTable((new static)->getTable())) {
             return collect();
         }
 

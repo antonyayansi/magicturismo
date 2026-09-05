@@ -20,6 +20,10 @@ class GaleriaPaqResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static bool $isGloballySearchable = false;
+
     public static function getModelLabel(): string
     {
         return 'Galería';

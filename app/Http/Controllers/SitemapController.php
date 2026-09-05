@@ -8,7 +8,6 @@ use App\Models\Paquetes;
 use App\Services\SiteSettings;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 
 class SitemapController extends Controller
 {
@@ -42,7 +41,7 @@ class SitemapController extends Controller
                 ];
             }
 
-            if (Schema::hasTable('paginas')) {
+            if (\App\Support\SchemaCache::hasTable('paginas')) {
                 foreach (Pagina::query()->publicadas()->get(['slug', 'updated_at']) as $pagina) {
                     if ($pagina->slug === 'contacto') {
                         continue;

@@ -58,11 +58,13 @@ class ManageSiteSettings extends Page implements HasForms
                     Forms\Components\FileUpload::make('logo')
                         ->image()
                         ->directory('empresa')
+                        ->nullable()
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
                         ->maxSize(2048),
                     Forms\Components\FileUpload::make('favicon')
                         ->image()
                         ->directory('empresa')
+                        ->nullable()
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'])
                         ->maxSize(1024),
                 ])->columns(2),
@@ -94,6 +96,15 @@ class ManageSiteSettings extends Page implements HasForms
     {
         $data = $this->form->getState();
         $record = datos_empresa::query()->first() ?? new datos_empresa();
+
+        foreach (['logo', 'favicon'] as $fileField) {
+            $value = $data[$fileField] ?? null;
+            if (is_array($value)) {
+                $value = $value[0] ?? null;
+            }
+            $data[$fileField] = filled($value) ? $value : null;
+        }
+
         $record->fill($data);
         $record->save();
         SiteSettings::forget();

@@ -32,6 +32,8 @@ class PaquetesResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    protected static ?string $recordTitleAttribute = 'titulo';
+
     public static function form(Form $form): Form
     {
         return $form

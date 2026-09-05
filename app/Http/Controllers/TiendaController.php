@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Pagina;
 use App\Services\SiteSettings;
-use Illuminate\Support\Facades\Schema;
 
 class TiendaController extends Controller
 {
     public function index()
     {
         $pagina = null;
-        if (Schema::hasTable('paginas')) {
+        if (\App\Support\SchemaCache::hasTable('paginas')) {
             $pagina = Pagina::query()->publicadas()->where('slug', 'responsabilidad')->first();
         }
 

@@ -8,7 +8,6 @@ use App\Models\datos_empresa;
 use App\Models\Paquetes;
 use App\Models\Testimonios;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class SiteSettings
@@ -33,6 +32,8 @@ class SiteSettings
             'site.home.diferentes',
             'site.home.testimonios',
             'site.sitemap',
+            'admin.dashboard',
+            'admin.reservas.pendientes',
         ] as $key) {
             Cache::forget($key);
         }
@@ -158,7 +159,7 @@ class SiteSettings
     public static function homeTestimonios()
     {
         return Cache::remember('site.home.testimonios', 1800, function () {
-            if (! Schema::hasTable('testimonios')) {
+            if (! \App\Support\SchemaCache::hasTable('testimonios')) {
                 return collect();
             }
 

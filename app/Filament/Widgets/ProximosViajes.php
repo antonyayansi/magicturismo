@@ -9,13 +9,13 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-class UltimasReservas extends BaseWidget
+class ProximosViajes extends BaseWidget
 {
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 4;
 
     protected static bool $isLazy = false;
 
-    protected static ?string $heading = 'Últimas consultas';
+    protected static ?string $heading = 'Próximos viajes';
 
     protected int | string | array $columnSpan = [
         'md' => 6,
@@ -27,19 +27,25 @@ class UltimasReservas extends BaseWidget
         return $table
             ->query(
                 Reservas::query()
-                    ->with('paquete:id,titulo')
-                    ->latest()
+                    ->with('paquete:id,titulo,tipo')
+                    ->whereDate('fecha_reserva', '>=', today())
+                    ->whereIn('estado', ['pendiente', 'pagado'])
+                    ->orderBy('fecha_reserva')
                     ->limit(6)
             )
             ->paginated(false)
             ->columns([
+                Tables\Columns\TextColumn::make('fecha_reserva')
+                    ->label('Fecha')
+                    ->date('d/m/Y')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('cliente')
                     ->searchable()
                     ->limit(22),
                 Tables\Columns\TextColumn::make('paquete.titulo')
-                    ->label('Experiencia')
+                    ->label('Tour / paquete')
                     ->placeholder('—')
-                    ->limit(26),
+                    ->limit(28),
                 Tables\Columns\TextColumn::make('cantidad_personas')
                     ->label('Pers.')
                     ->alignEnd(),
@@ -47,10 +53,6 @@ class UltimasReservas extends BaseWidget
                     ->badge()
                     ->formatStateUsing(fn (?string $state) => ReservaEstado::etiqueta($state))
                     ->color(fn (?string $state) => ReservaEstado::colorFilament($state)),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Recibida')
-                    ->since()
-                    ->toggleable(),
             ])
             ->recordUrl(fn (Reservas $record) => ReservasResource::getUrl('edit', ['record' => $record]));
     }

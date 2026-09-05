@@ -19,6 +19,10 @@ class ItinerarioPaqueteResource extends Resource
     protected static ?string $model = ItinerarioPaquete::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static bool $isGloballySearchable = false;
     public static function getModelLabel(): string
     {
         return 'Itinerario';

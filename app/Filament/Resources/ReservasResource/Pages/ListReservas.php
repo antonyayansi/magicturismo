@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ReservasResource\Pages;
 
+use App\Filament\Pages\ReservasKanban;
 use App\Filament\Resources\ReservasResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,6 +14,10 @@ class ListReservas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('kanban')
+                ->label('Tablero Kanban')
+                ->url(ReservasKanban::getUrl())
+                ->color('gray'),
             Actions\CreateAction::make(),
         ];
     }

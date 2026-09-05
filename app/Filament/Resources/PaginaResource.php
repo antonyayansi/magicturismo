@@ -28,6 +28,8 @@ class PaginaResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    protected static bool $isGloballySearchable = false;
+
     public static function form(Form $form): Form
     {
         return $form->schema([

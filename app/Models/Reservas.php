@@ -30,6 +30,11 @@ class Reservas extends Model
         return $this->belongsTo(Paquetes::class, 'paquete_id');
     }
 
+    public function estadoRegistro()
+    {
+        return $this->belongsTo(ReservaEstado::class, 'estado', 'clave');
+    }
+
     // Relación con la tabla 'users' (una reserva pertenece a un usuario)
     public function usuario()
     {
@@ -37,4 +42,10 @@ class Reservas extends Model
     }
 
     protected $dates = ['created_at', 'updated_at', 'fecha_reserva'];
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => \App\Services\DashboardMetrics::forget());
+        static::deleted(fn () => \App\Services\DashboardMetrics::forget());
+    }
 }

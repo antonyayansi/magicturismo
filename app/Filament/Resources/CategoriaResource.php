@@ -28,6 +28,8 @@ class CategoriaResource extends Resource
 
     protected static ?string $navigationGroup = 'Catálogo';
 
+    protected static bool $isGloballySearchable = false;
+
     public static function form(Form $form): Form
     {
         return $form

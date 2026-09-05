@@ -25,7 +25,9 @@ class TestimoniosResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Testimonios';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 5;
+
+    protected static bool $isGloballySearchable = false;
 
     public static function form(Form $form): Form
     {

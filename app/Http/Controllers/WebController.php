@@ -9,7 +9,6 @@ use App\Models\Paquetes;
 use App\Models\Reservas;
 use App\Services\SiteSettings;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 
 class WebController extends Controller
 {
@@ -135,7 +134,7 @@ class WebController extends Controller
     public function contactos()
     {
         $pagina = null;
-        if (Schema::hasTable('paginas')) {
+        if (\App\Support\SchemaCache::hasTable('paginas')) {
             $pagina = Pagina::query()->publicadas()->where('slug', 'contacto')->first();
         }
 
