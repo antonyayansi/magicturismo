@@ -1,7 +1,12 @@
 @extends('layout.es')
-@section('titulo', 'Responsabilidad Social - Magic Tours')
-@section('palabras')
-@section('descripcion')
+@php
+    $pageTitle = optional($pagina)->meta_title ?: optional($pagina)->titulo ?: \App\Models\Contenido::texto('tienda.meta_title', 'Responsabilidad Social | Magic Journeys Peru');
+    $pageDesc = optional($pagina)->meta_description ?: optional($pagina)->extracto ?: \App\Models\Contenido::texto('tienda.meta_description', 'Trabajamos con comunidades rurales del Perú.');
+    $pageHeading = optional($pagina)->titulo ?: \App\Models\Contenido::texto('tienda.titulo', 'Responsabilidad social');
+@endphp
+@section('titulo', $pageTitle)
+@section('palabras', optional($pagina)->meta_keywords ?: '')
+@section('descripcion', $pageDesc)
 @section('contenido')
     @php
         $imagenes = [
@@ -50,10 +55,10 @@
     <div class="breadcumb-wrapper" data-bg-src="{{ asset('assets/img/bg/breadcumb-bg.jpg') }}">
         <div class="container">
             <div class="breadcumb-content">
-                <h1 class="breadcumb-title">Responsabilidad social</h1>
+                <h1 class="breadcumb-title">{{ $pageHeading }}</h1>
                 <ul class="breadcumb-menu">
                     <li><a href="{{ route('home') }}">Home</a></li>
-                    <li>Responsabilidad social</li>
+                    <li>{{ $pageHeading }}</li>
                 </ul>
             </div>
         </div>
@@ -61,12 +66,11 @@
     <section class="py-5 bg-light">
         <div class="container">
             <p class="lead text-center mb-5">
-                En nuestra empresa, dirigimos nuestros esfuerzos hacia la promoción del desarrollo integral de las
-                comunidades rurales
-                con las que trabajamos, las cuales cuentan con un valioso potencial cultural, tradicional y natural.
-                Creemos firmemente en el poder del trabajo colaborativo y en la preservación del patrimonio local como
-                motores de cambio positivo.
+                @contenido('tienda.intro', 'En nuestra empresa, dirigimos nuestros esfuerzos hacia la promoción del desarrollo integral de las comunidades rurales con las que trabajamos, las cuales cuentan con un valioso potencial cultural, tradicional y natural. Creemos firmemente en el poder del trabajo colaborativo y en la preservación del patrimonio local como motores de cambio positivo.')
             </p>
+            @if (!empty(optional($pagina)->contenido))
+                <div class="mb-5">{!! $pagina->contenido !!}</div>
+            @endif
 
             <div class="row mb-4">
                 <div class="col-md-6 lead">

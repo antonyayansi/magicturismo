@@ -47,7 +47,7 @@ class UsersController extends Controller
         auth()->login($user);
 
         // Redirect to the intended page or dashboard
-        return redirect()->intended('/admin/dashboard');
+        return redirect()->intended('/');
     }
 
 

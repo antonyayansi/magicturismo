@@ -11,11 +11,13 @@
     <meta name="robots" content="INDEX,FOLLOW">
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
     <link rel="canonical" href="@yield('canonical', url()->current())">
+    <link rel="sitemap" type="application/xml" href="{{ url('/sitemap.xml') }}">
     <meta property="og:title" content="@yield('og_title', trim($__env->yieldContent('titulo')) ?: ($datos->meta_title ?? 'Magic Journeys Peru'))">
     <meta property="og:description" content="@yield('og_description', trim($__env->yieldContent('descripcion')) ?: ($datos->meta_description ?? ''))">
     <meta property="og:url" content="@yield('canonical', url()->current())">
+    <meta property="og:image" content="@yield('og_image', \App\Services\SiteSettings::logoUrl())">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Magic Journeys Peru">
+    <meta property="og:site_name" content="{{ $datos->nombre ?? 'Magic Journeys Peru' }}">
     <link rel="icon" href="{{ \App\Services\SiteSettings::faviconUrl() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -35,8 +37,8 @@
         $urlFrances = $datos->url_frances ?: 'https://voyagesmagiquesperou.com/';
         $faqUrl = $datos->faq_url ?: '#';
         $soporteUrl = $datos->soporte_url ?: '#';
-        $navTours = isset($tours) ? (is_iterable($tours) ? collect($tours)->take(5) : collect()) : collect();
-        $navPaquetes = isset($paquetes) ? (is_iterable($paquetes) ? collect($paquetes)->take(5) : collect()) : collect();
+        $navTours = \App\Services\SiteSettings::navTours();
+        $navPaquetes = \App\Services\SiteSettings::navPaquetes();
         $hasCmsHeader = isset($menuHeader) && $menuHeader instanceof \Illuminate\Support\Collection && $menuHeader->isNotEmpty();
         $hasCmsFooter = isset($menuFooter) && $menuFooter instanceof \Illuminate\Support\Collection && $menuFooter->isNotEmpty();
         $footerAbout = $datos->footer_texto ?: \App\Models\Contenido::texto('footer.about', 'Diseñamos experiencias auténticas en Perú: tours, caminatas y paquetes a tu medida.');
@@ -447,6 +449,29 @@
     <script src="{{ asset('assets/js/matterjs-custom.js') }}"></script>
     <script src="{{ asset('assets/js/nice-select.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'TravelAgency',
+            'name' => $datos->nombre ?? 'Magic Journeys Peru',
+            'url' => url('/'),
+            'logo' => $logoUrl,
+            'description' => $datos->meta_description ?? ($datos->desc_corto ?? ''),
+            'telephone' => $datos->telefono ?? null,
+            'email' => $datos->email ?? null,
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => $datos->direccion ?? null,
+            ],
+            'sameAs' => array_values(array_filter([
+                $datos->facebook ?? null,
+                $datos->instagram ?? null,
+                $datos->youtube ?? null,
+                $datos->linkedin ?? null,
+                $datos->twitter ?? null,
+            ])),
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
 </body>
 
 </html>

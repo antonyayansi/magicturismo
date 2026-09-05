@@ -2,25 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Carrusel;
 use App\Models\Categoria;
-use App\Models\datos_empresa;
+use App\Models\Contenido;
 use App\Models\Pagina;
 use App\Models\Paquetes;
 use App\Models\Reservas;
-use App\Models\Testimonios;
+use App\Services\SiteSettings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class WebController extends Controller
 {
-    protected function navPackages()
-    {
-        $tours = Paquetes::query()->publicados()->where('tipo', 'tour')->with('categoria')->orderByDesc('id')->get();
-        $paquetes = Paquetes::query()->publicados()->where('tipo', 'paquete')->with('categoria')->orderByDesc('id')->get();
-
-        return compact('tours', 'paquetes');
-    }
-
     protected function categoriasUnicas()
     {
         return Categoria::query()
@@ -35,150 +27,200 @@ class WebController extends Controller
         return ['categoria', 'galeria', 'incluye', 'itinerarios'];
     }
 
+    protected function applyCatalogFilters($query, Request $request)
+    {
+        if ($destino = trim((string) $request->query('destino'))) {
+            $query->where(function ($q) use ($destino) {
+                $q->where('ubicacion', 'like', '%'.$destino.'%')
+                    ->orWhere('titulo', 'like', '%'.$destino.'%');
+            });
+        }
+
+        if ($duracion = trim((string) $request->query('duracion'))) {
+            $query->where(function ($q) use ($duracion) {
+                $q->where('duracion', 'like', $duracion.'%')
+                    ->orWhere('duracion', 'like', '%'.$duracion.' %')
+                    ->orWhere('duracion', 'like', '%'.$duracion.'d%');
+            });
+        }
+
+        return $query;
+    }
+
+    protected function catalogQuery(array $tipos, Request $request)
+    {
+        $query = Paquetes::query()->publicados()->with('categoria');
+
+        if ($tipos !== []) {
+            $query->whereIn('tipo', $tipos);
+        }
+
+        return $this->applyCatalogFilters($query, $request)->orderByDesc('id');
+    }
+
     public function index()
     {
-        $datos = datos_empresa::first();
-        $carrusels = Carrusel::orderByDesc('id')->get();
-        $tours = Paquetes::query()->publicados()->where('tipo', 'tour')->orderByDesc('id')->get();
-        $categorias = Categoria::orderByDesc('id')->get();
-        $diferentes = Paquetes::query()
-            ->publicados()
-            ->where('tipo', 'diferente')
-            ->with(['galeria' => fn ($q) => $q->limit(3)])
-            ->orderByDesc('id')
-            ->get();
-
-        $todos = Paquetes::query()->publicados()->orderByDesc('id')->get();
-        $paquetes = Paquetes::query()->publicados()->where('tipo', 'paquete')->orderByDesc('id')->get();
-        $testimonios = Testimonios::where('estado', 'activo')->orderByDesc('id')->get();
-
-        return view('index', compact('datos', 'tours', 'carrusels', 'categorias', 'diferentes', 'testimonios', 'todos', 'paquetes'));
+        return view('index', [
+            'datos' => SiteSettings::datos(),
+            'carrusels' => SiteSettings::homeCarrusels(),
+            'tours' => SiteSettings::homeTours(),
+            'categorias' => SiteSettings::categorias(),
+            'diferentes' => SiteSettings::homeDiferentes(),
+            'todos' => SiteSettings::homeTodos(),
+            'paquetes' => SiteSettings::homePaquetes(),
+            'testimonios' => SiteSettings::homeTestimonios(),
+            'destinos' => SiteSettings::destinos(),
+        ]);
     }
 
-    public function tours()
+    public function tours(Request $request)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
-        $toursList = Paquetes::query()->publicados()->where('tipo', 'tour')->with('categoria')->orderByDesc('id')->paginate(12);
-        $categorias = $this->categoriasUnicas();
-
         return view('tours', [
-            'datos' => $datos,
-            'tours' => $toursList,
-            'paquetes' => $paquetes,
-            'categorias' => $categorias,
-            'navTours' => $tours,
+            'datos' => SiteSettings::datos(),
+            'tours' => $this->catalogQuery(['tour'], $request)->paginate(12)->withQueryString(),
+            'categorias' => $this->categoriasUnicas(),
+            'destinos' => SiteSettings::destinos(),
         ]);
     }
 
-    public function toursdetalle(Request $request, $slug)
+    public function toursdetalle(string $slug)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
         $tour = Paquetes::where('slug', $slug)->with($this->packageDetailRelations())->firstOrFail();
-        $categorias = $this->categoriasUnicas();
 
-        return view('detalle', compact('datos', 'tours', 'paquetes', 'tour', 'categorias'));
+        return view('detalle', $this->detallePayload($tour));
     }
 
-    public function caminatas()
+    public function caminatas(Request $request)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
-        $caminatas = Paquetes::query()
-            ->publicados()
-            ->whereIn('tipo', ['caminata', 'treks'])
-            ->with('categoria')
-            ->orderByDesc('id')
-            ->paginate(12);
-
-        return view('caminatas', compact('datos', 'tours', 'paquetes', 'caminatas'));
+        return view('caminatas', [
+            'datos' => SiteSettings::datos(),
+            'caminatas' => $this->catalogQuery(['caminata', 'treks'], $request)->paginate(12)->withQueryString(),
+        ]);
     }
 
-    public function caminatadetalle(Request $request, $slug)
+    public function caminatadetalle(string $slug)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
         $tour = Paquetes::where('slug', $slug)->with($this->packageDetailRelations())->firstOrFail();
-        $categorias = $this->categoriasUnicas();
 
-        return view('detalle', compact('datos', 'tours', 'paquetes', 'tour', 'categorias'));
+        return view('detalle', $this->detallePayload($tour));
     }
 
-    public function paquetes()
+    public function paquetes(Request $request)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
-        $paquetesList = Paquetes::query()->publicados()->where('tipo', 'paquete')->with('categoria')->orderByDesc('id')->paginate(12);
-
         return view('paquetes', [
-            'datos' => $datos,
-            'tours' => $tours,
-            'paquetes' => $paquetesList,
+            'datos' => SiteSettings::datos(),
+            'paquetes' => $this->catalogQuery(['paquete'], $request)->paginate(12)->withQueryString(),
         ]);
     }
 
-    public function paquetesdetalle(Request $request, $slug)
+    public function paquetesdetalle(string $slug)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
         $tour = Paquetes::where('slug', $slug)->with($this->packageDetailRelations())->firstOrFail();
-        $categorias = $this->categoriasUnicas();
 
-        return view('detalle', compact('datos', 'tours', 'paquetes', 'tour', 'categorias'));
+        return view('detalle', $this->detallePayload($tour));
+    }
+
+    public function diferentes(Request $request)
+    {
+        return view('tours', [
+            'datos' => SiteSettings::datos(),
+            'tours' => $this->catalogQuery(['diferente'], $request)->paginate(12)->withQueryString(),
+            'categorias' => $this->categoriasUnicas(),
+            'pageTitle' => Contenido::texto('listados.diferente_meta_title', 'Algo diferente | Magic Journeys Peru'),
+            'pageDescription' => Contenido::texto('listados.diferente_meta_description', 'Experiencias distintas en Cusco y el Perú.'),
+            'pageHeading' => Contenido::texto('listados.diferente_titulo', 'Algo diferente'),
+        ]);
     }
 
     public function contactos()
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
         $pagina = null;
-        if (\Illuminate\Support\Facades\Schema::hasTable('paginas')) {
+        if (Schema::hasTable('paginas')) {
             $pagina = Pagina::query()->publicadas()->where('slug', 'contacto')->first();
         }
 
-        return view('contacto', compact('datos', 'tours', 'paquetes', 'pagina'));
+        return view('contacto', [
+            'datos' => SiteSettings::datos(),
+            'pagina' => $pagina,
+        ]);
     }
 
-    public function categorias($slug)
+    public function categorias(string $slug)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
         $categoria = Categoria::where('slug', $slug)->firstOrFail();
-        $toursList = Paquetes::query()
-            ->publicados()
-            ->where('categoria_id', $categoria->id)
-            ->with('categoria')
-            ->orderByDesc('id')
-            ->paginate(12);
 
         return view('categorias', [
-            'datos' => $datos,
-            'tours' => $toursList,
-            'paquetes' => $paquetes,
+            'datos' => SiteSettings::datos(),
             'categoria' => $categoria,
-            'navTours' => $tours,
+            'tours' => Paquetes::query()
+                ->publicados()
+                ->where('categoria_id', $categoria->id)
+                ->with('categoria')
+                ->orderByDesc('id')
+                ->paginate(12)
+                ->withQueryString(),
         ]);
+    }
+
+    public function categoriasdetalle(string $slug, string $slug2)
+    {
+        $categoria = Categoria::where('slug', $slug)->firstOrFail();
+        $tour = Paquetes::query()
+            ->where('slug', $slug2)
+            ->where('categoria_id', $categoria->id)
+            ->with($this->packageDetailRelations())
+            ->firstOrFail();
+
+        return view('detalle', $this->detallePayload($tour));
+    }
+
+    protected function detallePayload(Paquetes $tour): array
+    {
+        return [
+            'datos' => SiteSettings::datos(),
+            'tour' => $tour,
+            'categorias' => SiteSettings::categorias(),
+            'recientes' => SiteSettings::navTours(),
+        ];
     }
 
     public function pagina(string $slug)
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
+        $canonicas = [
+            'contacto' => 'contacto',
+            'responsabilidad' => 'responsabilidad',
+            'tours' => 'tours',
+            'paquetes' => 'paquetes',
+            'caminatas' => 'caminatas',
+        ];
+        if (isset($canonicas[$slug])) {
+            return redirect()->route($canonicas[$slug], [], 301);
+        }
+
+        $reservadas = [
+            'admin', 'login', 'register', 'reservas', 'logout',
+            'pagina', 'diferente', 'sitemap.xml',
+        ];
+
+        abort_if(in_array($slug, $reservadas, true), 404);
+
         $pagina = Pagina::query()->publicadas()->where('slug', $slug)->firstOrFail();
 
-        return view('pagina', compact('datos', 'tours', 'paquetes', 'pagina'));
+        return view('pagina', [
+            'datos' => SiteSettings::datos(),
+            'pagina' => $pagina,
+        ]);
     }
 
     public function reservas(Request $request)
     {
         $request->validate([
-            'paquete_id' => 'required',
-            'cliente' => 'required',
-            'email' => 'required|email',
-            'comentario' => 'nullable',
-            'cantidad_personas' => 'required|integer|min:1',
-            'fecha_reserva' => 'required|date',
+            'paquete_id' => 'required|integer',
+            'cliente' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'comentario' => 'nullable|string|max:2000',
+            'cantidad_personas' => 'required|integer|min:1|max:50',
+            'fecha_reserva' => 'required|date|after_or_equal:today',
         ]);
 
         $reserva = new Reservas();
@@ -196,17 +238,11 @@ class WebController extends Controller
 
     public function login()
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
-
-        return view('login', compact('datos', 'tours', 'paquetes'));
+        return view('login', ['datos' => SiteSettings::datos()]);
     }
 
-    public function register(Request $request)
+    public function register()
     {
-        $datos = datos_empresa::first();
-        extract($this->navPackages());
-
-        return view('register', compact('datos', 'tours', 'paquetes'));
+        return view('register', ['datos' => SiteSettings::datos()]);
     }
 }

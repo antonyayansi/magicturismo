@@ -25,9 +25,9 @@
             <div class="row">
                 <div class="col-xl-7">
                     <div class="img-box3">
-                        <div class="img1"><img src="{{ asset('assets/img/normal/about_3_1.jpg') }}" alt="About"></div>
-                        <div class="img2"><img src="{{ asset('assets/img/normal/about_3_2.jpg') }}" alt="About"></div>
-                        <div class="img3 movingX"><img src="{{ asset('assets/img/normal/about_3_3.jpg') }}" alt="About"></div>
+                        <div class="img1"><img src="{{ optional($pagina)->imagen ? Storage::url($pagina->imagen) : \App\Models\Contenido::imagenUrl('contacto.img1', asset('assets/img/normal/about_3_1.jpg')) }}" alt="About" loading="lazy"></div>
+                        <div class="img2"><img src="{{ \App\Models\Contenido::imagenUrl('contacto.img2', asset('assets/img/normal/about_3_2.jpg')) }}" alt="About" loading="lazy"></div>
+                        <div class="img3 movingX"><img src="{{ \App\Models\Contenido::imagenUrl('contacto.img3', asset('assets/img/normal/about_3_3.jpg')) }}" alt="About" loading="lazy"></div>
                     </div>
                 </div>
                 <div class="col-xl-5">

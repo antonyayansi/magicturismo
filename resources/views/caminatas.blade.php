@@ -1,16 +1,16 @@
 @extends('layout.es')
-@section('titulo', 'Caminatas - Magic Tours')
-@section('palabras')
-@section('descripcion')
+@section('titulo', \App\Models\Contenido::texto('listados.caminatas_meta_title', 'Caminatas | Magic Journeys Peru'))
+@section('palabras', \App\Models\Contenido::texto('listados.caminatas_meta_keywords', ''))
+@section('descripcion', \App\Models\Contenido::texto('listados.caminatas_meta_description', 'Caminatas y trekking en Cusco y el Perú.'))
 @section('contenido')
 
     <div class="breadcumb-wrapper" data-bg-src="{{ asset('assets/img/bg/breadcumb-bg.jpg') }}">
         <div class="container">
             <div class="breadcumb-content">
-                <h1 class="breadcumb-title">Nuestras Caminatas</h1>
+                <h1 class="breadcumb-title">@contenido('listados.caminatas_titulo', 'Nuestras Caminatas')</h1>
                 <ul class="breadcumb-menu">
                     <li><a href="{{ route('home') }}">Home</a></li>
-                    <li>Nuestras Caminatas</li>
+                    <li>@contenido('listados.caminatas_titulo', 'Nuestras Caminatas')</li>
                 </ul>
             </div>
         </div>
@@ -28,7 +28,7 @@
                                     <div class="col-md-3">
                                         <div class="tour-box th-ani">
                                             <div class="tour-box_img global-img">
-                                                <img src="{{ Storage::url(  $caminata->imagen) }}" alt="image">
+                                                <img src="{{ Storage::url($caminata->imagen) }}" alt="{{ $caminata->titulo }}" loading="lazy">
                                             </div>
                                             <div class="tour-content">
                                                 <h3 class="box-title">

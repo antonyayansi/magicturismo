@@ -34,6 +34,30 @@ class CmsContentSeeder extends Seeder
             ['clave' => 'contacto.titulo', 'grupo' => 'contacto', 'titulo' => 'Título contacto', 'texto' => 'Vive, explora y descubre el mundo con nosotros.'],
             ['clave' => 'contacto.parrafo1', 'grupo' => 'contacto', 'titulo' => 'Párrafo 1', 'texto' => 'Somos una agencia de viajes reconocida a nivel mundial, especializada en ofrecer experiencias inolvidables a nuestros clientes.'],
             ['clave' => 'contacto.parrafo2', 'grupo' => 'contacto', 'titulo' => 'Párrafo 2', 'texto' => 'Existen muchas formas de viajar, pero la mayoría de experiencias comunes han sido afectadas por servicios poco personalizados. En Magic Journeys nos enfocamos en brindarte aventuras auténticas, cuidadosamente diseñadas para que cada momento cuente.'],
+            ['clave' => 'home.paquetes_subtitulo', 'grupo' => 'inicio', 'titulo' => 'Subtítulo paquetes', 'texto' => 'Nuestros'],
+            ['clave' => 'home.paquetes_titulo', 'grupo' => 'inicio', 'titulo' => 'Título paquetes', 'texto' => 'Paquetes'],
+            ['clave' => 'home.galeria_subtitulo', 'grupo' => 'inicio', 'titulo' => 'Subtítulo galería', 'texto' => 'Nuestra Galería'],
+            ['clave' => 'home.galeria_titulo', 'grupo' => 'inicio', 'titulo' => 'Título galería', 'texto' => 'Imágenes'],
+            ['clave' => 'home.testimonios_subtitulo', 'grupo' => 'inicio', 'titulo' => 'Subtítulo testimonios', 'texto' => 'Testimonios'],
+            ['clave' => 'home.testimonios_titulo', 'grupo' => 'inicio', 'titulo' => 'Título testimonios', 'texto' => 'Nuestros clientes opinan'],
+            ['clave' => 'home.blog_subtitulo', 'grupo' => 'inicio', 'titulo' => 'Subtítulo viajes', 'texto' => 'Viajes'],
+            ['clave' => 'home.blog_titulo', 'grupo' => 'inicio', 'titulo' => 'Título viajes', 'texto' => 'Creando viajes sostenibles'],
+            ['clave' => 'listados.tours_titulo', 'grupo' => 'listados', 'titulo' => 'Título listado tours', 'texto' => 'Nuestros Tours'],
+            ['clave' => 'listados.tours_meta_title', 'grupo' => 'listados', 'titulo' => 'SEO título tours', 'texto' => 'Tours | Magic Journeys Peru'],
+            ['clave' => 'listados.tours_meta_description', 'grupo' => 'listados', 'titulo' => 'SEO descripción tours', 'texto' => 'Descubre nuestros tours en Cusco y el Perú.'],
+            ['clave' => 'listados.paquetes_titulo', 'grupo' => 'listados', 'titulo' => 'Título listado paquetes', 'texto' => 'Nuestros Paquetes'],
+            ['clave' => 'listados.paquetes_meta_title', 'grupo' => 'listados', 'titulo' => 'SEO título paquetes', 'texto' => 'Paquetes | Magic Journeys Peru'],
+            ['clave' => 'listados.paquetes_meta_description', 'grupo' => 'listados', 'titulo' => 'SEO descripción paquetes', 'texto' => 'Paquetes de viaje en Cusco y el Perú.'],
+            ['clave' => 'listados.caminatas_titulo', 'grupo' => 'listados', 'titulo' => 'Título listado caminatas', 'texto' => 'Nuestras Caminatas'],
+            ['clave' => 'listados.caminatas_meta_title', 'grupo' => 'listados', 'titulo' => 'SEO título caminatas', 'texto' => 'Caminatas | Magic Journeys Peru'],
+            ['clave' => 'listados.caminatas_meta_description', 'grupo' => 'listados', 'titulo' => 'SEO descripción caminatas', 'texto' => 'Caminatas y trekking en Cusco y el Perú.'],
+            ['clave' => 'listados.diferente_titulo', 'grupo' => 'listados', 'titulo' => 'Título listado diferente', 'texto' => 'Algo diferente'],
+            ['clave' => 'listados.diferente_meta_title', 'grupo' => 'listados', 'titulo' => 'SEO título diferente', 'texto' => 'Algo diferente | Magic Journeys Peru'],
+            ['clave' => 'listados.diferente_meta_description', 'grupo' => 'listados', 'titulo' => 'SEO descripción diferente', 'texto' => 'Experiencias distintas en Cusco y el Perú.'],
+            ['clave' => 'tienda.titulo', 'grupo' => 'tienda', 'titulo' => 'Título responsabilidad', 'texto' => 'Responsabilidad social'],
+            ['clave' => 'tienda.meta_title', 'grupo' => 'tienda', 'titulo' => 'SEO título responsabilidad', 'texto' => 'Responsabilidad Social | Magic Journeys Peru'],
+            ['clave' => 'tienda.meta_description', 'grupo' => 'tienda', 'titulo' => 'SEO descripción responsabilidad', 'texto' => 'Trabajamos con comunidades rurales del Perú.'],
+            ['clave' => 'tienda.intro', 'grupo' => 'tienda', 'titulo' => 'Intro responsabilidad', 'texto' => 'En nuestra empresa, dirigimos nuestros esfuerzos hacia la promoción del desarrollo integral de las comunidades rurales con las que trabajamos, las cuales cuentan con un valioso potencial cultural, tradicional y natural. Creemos firmemente en el poder del trabajo colaborativo y en la preservación del patrimonio local como motores de cambio positivo.'],
         ];
 
         foreach ($contenidos as $index => $item) {
@@ -51,6 +75,18 @@ class CmsContentSeeder extends Seeder
                 'contenido' => null,
                 'meta_title' => 'Sobre nosotros | Magic Journeys Peru',
                 'meta_description' => 'Conoce a Magic Journeys Peru, agencia de tours, caminatas y paquetes en Cusco y el Perú.',
+                'estado' => 'activo',
+            ]
+        );
+
+        Pagina::query()->firstOrCreate(
+            ['slug' => 'responsabilidad'],
+            [
+                'titulo' => 'Responsabilidad social',
+                'extracto' => 'Trabajamos con comunidades rurales del Perú.',
+                'contenido' => null,
+                'meta_title' => 'Responsabilidad Social | Magic Journeys Peru',
+                'meta_description' => 'Impulsamos el desarrollo de comunidades rurales a través del turismo sostenible.',
                 'estado' => 'activo',
             ]
         );

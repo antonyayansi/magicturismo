@@ -66,4 +66,15 @@ class Contenido extends Model
 
         return $item?->imagen ?: $default;
     }
+
+    public static function imagenUrl(string $clave, ?string $default = null): string
+    {
+        $path = static::imagen($clave);
+
+        if ($path) {
+            return \Illuminate\Support\Facades\Storage::url($path);
+        }
+
+        return $default ?: '';
+    }
 }

@@ -1,7 +1,7 @@
 @extends('layout.es')
-@section('titulo', 'Categoría '.$categoria->nombre . ' - Magic Tours')
-@section('palabras')
-@section('descripcion')
+@section('titulo', $categoria->seoTitle())
+@section('palabras', $categoria->meta_keywords ?: '')
+@section('descripcion', $categoria->seoDescription())
 @section('contenido')
 
     <div class="breadcumb-wrapper" data-bg-src="{{ asset('assets/img/bg/breadcumb-bg.jpg') }}">
@@ -28,11 +28,11 @@
                                     <div class="col-md-3">
                                         <div class="tour-box th-ani">
                                             <div class="tour-box_img global-img">
-                                                <img src="{{ Storage::url(  $paquete->imagen) }}" alt="image">
+                                                <img src="{{ Storage::url($paquete->imagen) }}" alt="{{ $paquete->titulo }}" loading="lazy">
                                             </div>
                                             <div class="tour-content">
                                                 <h3 class="box-title">
-                                                    <a href="{{ route('paquetesdetalle', ['slug' => $paquete->slug]) }}">{{ $paquete->titulo }}</a>
+                                                    <a href="{{ $paquete->publicUrl() }}">{{ $paquete->titulo }}</a>
                                                 </h3>
                                                 
                                                 <h4 class="tour-box_price">
@@ -42,7 +42,7 @@
                                                     <span>
                                                         <i class="fa-light fa-clock"></i>{{ $paquete->duracion }}
                                                     </span>
-                                                    <a href="{{ route('paquetesdetalle', ['slug' => $paquete->slug]) }}" class="th-btn style4">Ver Detalle</a>
+                                                    <a href="{{ $paquete->publicUrl() }}" class="th-btn style4">Ver Detalle</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -52,7 +52,7 @@
                             </div>
                         </div>
 
-                        {{ $paquetes->links('vendor.pagination.custom') }}
+                        {{ $tours->links('vendor.pagination.custom') }}
 
 
                     </div>

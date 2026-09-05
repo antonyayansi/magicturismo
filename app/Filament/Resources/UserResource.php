@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RestrictsToAdmin;
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
+    use RestrictsToAdmin;
+
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
@@ -46,9 +46,10 @@ class UserResource extends Resource
                     ->label('Email')
                     ->email(),
                 Forms\Components\TextInput::make('password')
-                    ->required()
                     ->label('Password')
-                    ->password(),
+                    ->password()
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->required(fn (string $operation) => $operation === 'create'),
                 Forms\Components\Select::make('nivel')
                     ->options([
                         'admin' => 'Administrador',
@@ -57,6 +58,12 @@ class UserResource extends Resource
                     ])
                     ->default('agente')
                     ->required(),
+                Forms\Components\Select::make('estado')
+                    ->options([
+                        'activo' => 'Activo',
+                        'inactivo' => 'Inactivo',
+                    ])
+                    ->default('activo'),
             ]);
     }
 
@@ -75,7 +82,11 @@ class UserResource extends Resource
                     ->searchable(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('nivel')->options([
+                    'admin' => 'Administrador',
+                    'agente' => 'Agente',
+                    'cliente' => 'Cliente',
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

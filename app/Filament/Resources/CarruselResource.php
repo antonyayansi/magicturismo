@@ -3,50 +3,63 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CarruselResource\Pages;
-use App\Filament\Resources\CarruselResource\RelationManagers;
 use App\Models\Carrusel;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CarruselResource extends Resource
 {
     protected static ?string $model = Carrusel::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-photo';
+
+    protected static ?string $navigationGroup = 'Contenido CMS';
+
+    protected static ?string $navigationLabel = 'Carrusel';
+
+    protected static ?string $modelLabel = 'Slide';
+
+    protected static ?string $pluralModelLabel = 'Carrusel';
+
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('titulo'),
-                Forms\Components\TextInput::make('subtitulo'),
-                Forms\Components\Textarea::make('texto'),
+                Forms\Components\TextInput::make('titulo')->maxLength(255),
+                Forms\Components\TextInput::make('subtitulo')->maxLength(255),
+                Forms\Components\Textarea::make('texto')->rows(3)->columnSpanFull(),
+                Forms\Components\TextInput::make('boton')
+                    ->label('Enlace del botón')
+                    ->url()
+                    ->maxLength(255)
+                    ->helperText('URL completa del botón "Explorar Más".'),
                 Forms\Components\Select::make('tipo')
                     ->label('Tipo de contenido')
                     ->options([
                         'imagen' => 'Imagen',
                         'video' => 'Video',
                     ])
-                    ->required(),
-                Forms\Components\Section::make('url')
-                    ->schema([
-                        Forms\Components\FileUpload::make('video')
-                            ->label('Video')
-                            ->directory('carruseles/videos')
-                            ->acceptedFileTypes(['video/mp4', 'video/avi', 'video/mov'])
-                            ->maxSize(100240), // en KB → 100 MB
-
-                        Forms\Components\FileUpload::make('imagen')
-                            ->label('Imagen')
-                            ->image()
-                            ->directory('carruseles/imagenes')
-                            ->maxSize(10048), // en KB → 10 MB
-                    ]),
+                    ->required()
+                    ->native(false),
+                Forms\Components\FileUpload::make('url')
+                    ->label('Archivo')
+                    ->directory('carrusel')
+                    ->acceptedFileTypes([
+                        'image/jpeg',
+                        'image/png',
+                        'image/webp',
+                        'video/mp4',
+                        'video/webm',
+                        'video/quicktime',
+                    ])
+                    ->maxSize(102400)
+                    ->required()
+                    ->helperText('Imagen o video. Máximo 100 MB. Se guarda en storage/app/public/carrusel.'),
             ]);
     }
 
@@ -54,29 +67,27 @@ class CarruselResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('titulo'),
-                Tables\Columns\TextColumn::make('subtitulo'),
-                Tables\Columns\TextColumn::make('tipo'),
-                Tables\Columns\TextColumn::make('url'),
+                Tables\Columns\TextColumn::make('titulo')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('subtitulo')->toggleable(),
+                Tables\Columns\TextColumn::make('tipo')->badge()->sortable(),
+                Tables\Columns\TextColumn::make('boton')->label('Botón')->limit(30)->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')->dateTime('d/m/Y H:i')->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('tipo')->options([
+                    'imagen' => 'Imagen',
+                    'video' => 'Video',
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->visible(fn () => auth()->user()?->isAdmin()),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

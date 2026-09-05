@@ -1,16 +1,16 @@
 @extends('layout.es')
-@section('titulo', 'Paquetes - Magic Tours')
-@section('palabras')
-@section('descripcion')
+@section('titulo', \App\Models\Contenido::texto('listados.paquetes_meta_title', 'Paquetes | Magic Journeys Peru'))
+@section('palabras', \App\Models\Contenido::texto('listados.paquetes_meta_keywords', ''))
+@section('descripcion', \App\Models\Contenido::texto('listados.paquetes_meta_description', 'Paquetes de viaje en Cusco y el Perú.'))
 @section('contenido')
 
     <div class="breadcumb-wrapper" data-bg-src="{{ asset('assets/img/bg/breadcumb-bg.jpg') }}">
         <div class="container">
             <div class="breadcumb-content">
-                <h1 class="breadcumb-title">Nuestros Paquetes</h1>
+                <h1 class="breadcumb-title">@contenido('listados.paquetes_titulo', 'Nuestros Paquetes')</h1>
                 <ul class="breadcumb-menu">
                     <li><a href="{{ route('home') }}">Home</a></li>
-                    <li>Nuestros Paquetes</li>
+                    <li>@contenido('listados.paquetes_titulo', 'Nuestros Paquetes')</li>
                 </ul>
             </div>
         </div>
@@ -28,7 +28,7 @@
                                     <div class="col-md-3">
                                         <div class="tour-box th-ani">
                                             <div class="tour-box_img global-img">
-                                                <img src="{{ Storage::url(  $paquete->imagen) }}" alt="image">
+                                                <img src="{{ Storage::url($paquete->imagen) }}" alt="{{ $paquete->titulo }}" loading="lazy">
                                             </div>
                                             <div class="tour-content">
                                                 <h3 class="box-title">

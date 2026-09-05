@@ -24,4 +24,23 @@ class Pagina extends Model
     {
         return $query->where('estado', 'activo');
     }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => \App\Services\SiteSettings::forget());
+        static::deleted(fn () => \App\Services\SiteSettings::forget());
+    }
+
+    public function publicUrl(): string
+    {
+        if ($this->slug === 'contacto') {
+            return route('contacto');
+        }
+
+        if ($this->slug === 'responsabilidad') {
+            return route('responsabilidad');
+        }
+
+        return route('pagina', $this->slug);
+    }
 }

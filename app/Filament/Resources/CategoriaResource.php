@@ -26,6 +26,8 @@ class CategoriaResource extends Resource
 
     protected static ?string $modelLabel = 'Categoría';
 
+    protected static ?string $navigationGroup = 'Catálogo';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -48,8 +50,18 @@ class CategoriaResource extends Resource
                     ->label('Imagen')
                     ->image()
                     ->directory('categorias')
-                    ->maxSize(10048) // 10 MB
-                    ->helperText('Tamaño máximo: 10 MB'),
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                    ->maxSize(4096)
+                    ->helperText('Tamaño máximo: 4 MB'),
+                Forms\Components\Textarea::make('descripcion')
+                    ->label('Descripción')
+                    ->rows(4)
+                    ->columnSpanFull(),
+                Forms\Components\Section::make('SEO')->schema([
+                    Forms\Components\TextInput::make('meta_title')->maxLength(255),
+                    Forms\Components\Textarea::make('meta_description')->rows(3),
+                    Forms\Components\TextInput::make('meta_keywords')->maxLength(255),
+                ])->columns(1)->collapsed(),
             ]);
     }
 
@@ -93,7 +105,9 @@ class CategoriaResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('con_paquetes')
+                    ->label('Con paquetes')
+                    ->query(fn (Builder $query) => $query->has('paquetes')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

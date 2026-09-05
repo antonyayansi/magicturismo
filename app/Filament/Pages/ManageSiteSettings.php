@@ -29,6 +29,11 @@ class ManageSiteSettings extends Page implements HasForms
 
     public ?array $data = [];
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->isAdmin() === true;
+    }
+
     public function mount(): void
     {
         $record = datos_empresa::query()->first() ?? new datos_empresa();

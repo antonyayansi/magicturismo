@@ -11,9 +11,13 @@
                 @foreach ($carrusels as $carru)
                     <div class="swiper-slide">
                         <div class="hero-inner">
-                            <video autoplay loop muted>
-                                <source src="{{ Storage::url('carrusel/' . $carru->url) }}" type="video/mp4">
-                            </video>
+                            @if ($carru->isVideo())
+                                <video autoplay loop muted playsinline>
+                                    <source src="{{ $carru->mediaUrl() }}" type="video/mp4">
+                                </video>
+                            @else
+                                <img src="{{ $carru->mediaUrl() }}" alt="{{ $carru->titulo }}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+                            @endif
                             <div class="container">
                                 <div class="hero-style2">
                                     <h1 class="hero-title" data-ani="slideinup" data-ani-delay="0.4s">
@@ -52,7 +56,7 @@
                         <div class="hero-inner">
                             <div class="hero-card">
                                 <div class="hero-img"><img src="{{ Storage::url($paq->imagen) }}"
-                                        alt="{{ $paq->titulo }}"></div>
+                                        alt="{{ $paq->titulo }}" loading="lazy"></div>
                                 <div class="hero-card_content">
                                     <h3 class="box-title">{{ $paq->titulo }}</h3>
                                     @if ($paq->precio)
@@ -61,7 +65,7 @@
                                             <span><i class="fa-light fa-clock"></i>{{ $paq->duracion }}</span>
                                         </h4>
                                     @endif
-                                    <a href="{{ route('toursdetalle', $paq->slug) }}" class="th-btn style2">Reservar</a>
+                                    <a href="{{ $paq->publicUrl() }}" class="th-btn style2">Reservar</a>
                                 </div>
                             </div>
                         </div>
@@ -90,7 +94,7 @@
                         <div class="swiper-slide">
                             <div class="category-card single">
                                 <div class="box-img global-img">
-                                    <img src="{{ Storage::url($cate->img) }}" alt="Image">
+                                    <img src="{{ Storage::url($cate->img) }}" alt="{{ $cate->nombre }}" loading="lazy">
                                 </div>
                                 <h3 class="box-title">
                                     <a href="{{ route('categorias', $cate->slug) }}">{{ $cate->nombre }}</a>
@@ -116,14 +120,9 @@
                                     class="form-select nice-select">
                                     <option value="Select Destination" selected="selected" disabled="disabled">Select
                                         Destination</option>
-                                    <option value="CUSCO">CUSCO</option>
-                                    <option value="LIMA">LIMA</option>
-                                    <option value="AREQUIPA">AREQUIPA</option>
-                                    <option value="PUNO">PUNO</option>
-                                    <option value="PARACAS">PARACAS</option>
-                                    <option value="ICA">ICA</option>
-                                    <option value="NAZCA">NAZCA</option>
-                                    <option value="AMAZONIA">AMAZONÍA</option>
+                                    @foreach (($destinos ?? collect(['CUSCO', 'LIMA', 'AREQUIPA', 'PUNO', 'PARACAS', 'ICA', 'NAZCA', 'AMAZONÍA'])) as $destino)
+                                        <option value="{{ $destino }}">{{ $destino }}</option>
+                                    @endforeach
                                 </select></div>
                         </div>
                         <div class="form-group col-md-6 col-lg-auto">
@@ -163,8 +162,8 @@
 
     <div class="destination-area position-relative overflow-hidden">
         <div class="container">
-            <div class="title-area text-center"><span class="sub-title">Nuestros</span>
-                <h2 class="sec-title">Paquetes</h2>
+            <div class="title-area text-center"><span class="sub-title">@contenido('home.paquetes_subtitulo', 'Nuestros')</span>
+                <h2 class="sec-title">@contenido('home.paquetes_titulo', 'Paquetes')</h2>
             </div>
             <div class="swiper th-slider destination-slider slider-drag-wrap" id="aboutSlider1"
                 data-slider-options='{"breakpoints":{"0":{"slidesPerView":1},"576":{"slidesPerView":"2"},"992":{"slidesPerView":"3"},"1200":{"slidesPerView":"3"}},"effect":"coverflow","coverflowEffect":{"rotate":"0","stretch":"95","depth":"212","modifier":"1"},"centeredSlides":"true"}'>
@@ -173,12 +172,12 @@
                         <div class="swiper-slide">
                             <div class="destination-box gsap-cursor">
                                 <div class="destination-img">
-                                    <img src="{{ Storage::url($paq->imagen) }}" alt="{{ $paq->titulo }}">
+                                    <img src="{{ Storage::url($paq->imagen) }}" alt="{{ $paq->titulo }}" loading="lazy">
                                     <div class="destination-content">
                                         <div class="media-left text-center">
-                                            <h4 class="box-title"><a href="">{{ $paq->titulo }}</a></h4>
+                                            <h4 class="box-title"><a href="{{ $paq->publicUrl() }}">{{ $paq->titulo }}</a></h4>
                                             <span class="destination-subtitle">{{ $paq->tipo }}</span>
-                                            <div class="mt-2"><a href="{{ route('toursdetalle', $paq->slug) }}"
+                                            <div class="mt-2"><a href="{{ $paq->publicUrl() }}"
                                                     class="th-btn style2 th-icon">Detalle</a></div>
                                         </div>
                                     </div>
@@ -195,11 +194,11 @@
             <div class="row">
                 <div class="col-xl-6">
                     <div class="img-box1">
-                        <div class="img1"><img src="{{ asset('assets/img/normal/about_1_1.jpg') }}" alt="About">
+                        <div class="img1"><img src="{{ \App\Models\Contenido::imagenUrl('home.about_img1', asset('assets/img/normal/about_1_1.jpg')) }}" alt="About" loading="lazy">
                         </div>
-                        <div class="img2"><img src="{{ asset('assets/img/normal/about_1_2.jpg') }}" alt="About">
+                        <div class="img2"><img src="{{ \App\Models\Contenido::imagenUrl('home.about_img2', asset('assets/img/normal/about_1_2.jpg')) }}" alt="About" loading="lazy">
                         </div>
-                        <div class="img3"><img src="{{ asset('assets/img/normal/about_1_3.jpg') }}" alt="About">
+                        <div class="img3"><img src="{{ \App\Models\Contenido::imagenUrl('home.about_img3', asset('assets/img/normal/about_1_3.jpg')) }}" alt="About" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -263,7 +262,7 @@
                             <div class="swiper-slide">
                                 <div class="tour-box th-ani gsap-cursor tour-box-gallery">
                                     <div class="tour-box_img global-img tour-gallery-container">
-                                        <img src="{{ Storage::url($dife->imagen) }}" alt="image" class="main-image">
+                                        <img src="{{ Storage::url($dife->imagen) }}" alt="{{ $dife->titulo }}" class="main-image" loading="lazy">
                                         @if($dife->galeria && $dife->galeria->count() > 0)
                                             <div class="gallery-grid-wrapper">
                                                 @foreach($dife->galeria->take(3) as $index => $img)
@@ -277,11 +276,11 @@
                                     </div>
                                     <div class="tour-content">
                                         <h3 class="box-title">
-                                            <a href="tour-details.html">{{ $dife->titulo }}</a>
+                                            <a href="{{ $dife->publicUrl() }}">{{ $dife->titulo }}</a>
                                         </h3>
                                         <div class="tour-action"><span><i
                                                     class="fa-light fa-clock"></i>{{ $dife->duracion }}</span> <a
-                                                href="{{ route('toursdetalle', $dife->slug) }}"
+                                                href="{{ $dife->publicUrl() }}"
                                                 class="th-btn style4 th-icon">Ver más</a></div>
                                     </div>
                                 </div>
@@ -404,8 +403,8 @@
     </section>
     <div class="gallery-area mt-5">
         <div class="container th-container">
-            <div class="title-area text-center"><span class="sub-title">Nuestra Galería</span>
-                <h2 class="sec-title">Imágenes</h2>
+            <div class="title-area text-center"><span class="sub-title">@contenido('home.galeria_subtitulo', 'Nuestra Galería')</span>
+                <h2 class="sec-title">@contenido('home.galeria_titulo', 'Imágenes')</h2>
             </div>
             <div class="shape-mockup d-none d-xl-block" data-top="-25%" data-left="0%"><img
                     src="{{ asset('assets/img/shape/line.png') }}" alt="shape"></div>
@@ -418,8 +417,8 @@
                         @foreach ($tours as $tour)
                         <div class="swiper-slide">
                             <div class="tour-card th-ani gsap-cursor">
-                                <div class="tour-card_img global-img"><img src="{{ Storage::url( $tour->imagen) }}"
-                                        alt="image"></div>
+                                <div class="tour-card_img global-img"><img src="{{ Storage::url($tour->imagen) }}"
+                                        alt="{{ $tour->titulo }}" loading="lazy"></div>
                                 <div class="tour-content">
                                     <h3 class="box-title"><a href="{{ route('toursdetalle', $tour->slug) }}">{{ $tour->titulo }}</a></h3>
                                     <div class="tour-rating">
@@ -443,8 +442,8 @@
 
     <section class="testi-area overflow-hidden space" id="testi-sec">
         <div class="container-fluid p-0">
-            <div class="title-area mb-20 text-center"><span class="sub-title">Testimonios</span>
-                <h2 class="sec-title">Nuestros clientes opinan </h2>
+            <div class="title-area mb-20 text-center"><span class="sub-title">@contenido('home.testimonios_subtitulo', 'Testimonios')</span>
+                <h2 class="sec-title">@contenido('home.testimonios_titulo', 'Nuestros clientes opinan')</h2>
             </div>
             <div class="slider-area">
                 <div class="swiper th-slider testiSlider1 has-shadow" id="testiSlider1"
@@ -486,8 +485,8 @@
             <div class="mb-30 text-center text-md-start">
                 <div class="row align-items-center justify-content-between">
                     <div class="col-md-7">
-                        <div class="title-area mb-md-0"><span class="sub-title">Viajes</span>
-                            <h2 class="sec-title">Creando viajes sostenibles</h2>
+                        <div class="title-area mb-md-0"><span class="sub-title">@contenido('home.blog_subtitulo', 'Viajes')</span>
+                            <h2 class="sec-title">@contenido('home.blog_titulo', 'Creando viajes sostenibles')</h2>
                         </div>
                     </div>
                 </div>
@@ -500,11 +499,10 @@
                             <div class="swiper-slide">
                                 <div class="blog-box th-ani">
                                     <div class="blog-img global-img"><img
-                                            src="{{ Storage::url( $diferente->imagen) }}" alt="blog image">
+                                            src="{{ Storage::url($diferente->imagen) }}" alt="{{ $diferente->titulo }}" loading="lazy">
                                     </div>
                                     <div class="blog-box_content">
-                                        <h3 class="box-title"><a 
-                                            >{{ $diferente->titulo }}</a></h3><a href="{{ route('paquetes', $diferente->slug) }}" class="th-btn style4 th-icon">
+                                        <h3 class="box-title"><a href="{{ $diferente->publicUrl() }}">{{ $diferente->titulo }}</a></h3><a href="{{ $diferente->publicUrl() }}" class="th-btn style4 th-icon">
                                             Saber más</a>
                                     </div>
                                 </div>
@@ -541,14 +539,15 @@
                 return;
             }
 
+            const params = `destino=${encodeURIComponent(subject)}&tipo=${encodeURIComponent(adventure)}&duracion=${encodeURIComponent(duration)}`;
             if(adventure == 'tour'){
-                window.location.href = `/tours?destino=${subject}&tipo=${adventure}&duracion=${duration}`;
+                window.location.href = `/tours?${params}`;
             }else if(adventure == 'paquete'){
-                window.location.href = `/paquetes?destino=${subject}&tipo=${adventure}&duracion=${duration}`;
+                window.location.href = `/paquetes?${params}`;
             }else if(adventure == 'caminata'){
-                window.location.href = `/caminatas?destino=${subject}&tipo=${adventure}&duracion=${duration}`;
+                window.location.href = `/caminatas?${params}`;
             }else{
-                window.location.href = `/diferente?destino=${subject}&tipo=${adventure}&duracion=${duration}`;
+                window.location.href = `/diferente?${params}`;
             }
                 
         }

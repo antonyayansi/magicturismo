@@ -265,11 +265,11 @@
                                 @foreach ($categorias as $cate)
                                     <li>
                                         <a href="{{ route('categorias', $cate->slug) }}">
-                                            <img src="{{ Storage::url('categorias/' . $cate->img) }}" alt="" width="20px"
-                                                height="20px">
+                                            <img src="{{ Storage::url($cate->img) }}" alt="{{ $cate->nombre }}" width="20"
+                                                height="20" loading="lazy">
                                             {{ $cate->nombre }}
                                         </a>
-                                        <span>({{ $cate->paquetes->count() }})</span>
+                                        <span>({{ $cate->paquetes_count ?? $cate->paquetes()->count() }})</span>
                                     </li>
                                 @endforeach
                             </ul>
@@ -277,16 +277,16 @@
                         <div class="widget">
                             <h3 class="widget_title">Tours Recientes</h3>
                             <div class="recent-post-wrap">
-                                @foreach ($tours->take(4)->sortBy('orden') as $tour2)
+                                @foreach ($recientes->take(4) as $tour2)
                                     <div class="recent-post">
                                         <div class="media-img">
-                                            <a href="#">
-                                                <img src="{{ Storage::url($tour2->imagen) }}" alt="Blog Image">
+                                            <a href="{{ $tour2->publicUrl() }}">
+                                                <img src="{{ Storage::url($tour2->imagen) }}" alt="{{ $tour2->titulo }}" loading="lazy">
                                             </a>
                                         </div>
                                         <div class="media-body">
                                             <h4 class="post-title">
-                                                <a class="text-inherit" href="#">{{ $tour2->titulo }}</a>
+                                                <a class="text-inherit" href="{{ $tour2->publicUrl() }}">{{ $tour2->titulo }}</a>
                                             </h4>
                                             <small>{{ $tour2->tipo }}</small>
 
@@ -312,8 +312,8 @@
                                     </div>
                                     <div class="offer">
                                         <h6 class="offer-title">Obtienes soporte en línea</h6><a class="offter-num"
-                                            href="#">+51 987 654 321</a>
-                                    </div><a href="contact.html" class="th-btn style2 th-icon">Contactarse Ahora</a>
+                                            href="tel:{{ $datos->telefono }}">{{ $datos->telefono }}</a>
+                                    </div><a href="{{ route('contacto') }}" class="th-btn style2 th-icon">Contactarse Ahora</a>
                                 </div>
                             </div>
                         </div>
@@ -331,6 +331,22 @@
 
         </div>
     </section>
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'TouristTrip',
+            'name' => $tour->titulo,
+            'description' => $tour->seoDescription(),
+            'url' => $tour->publicUrl(),
+            'image' => $tour->imagen ? Storage::url($tour->imagen) : null,
+            'touristType' => $tour->tipo,
+            'offers' => $tour->precio ? [
+                '@type' => 'Offer',
+                'price' => $tour->precio,
+                'priceCurrency' => 'USD',
+            ] : null,
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
 @endsection
 
 @push('modales')

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\SiteSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -51,6 +52,26 @@ class Paquetes extends Model
         $tipos = collect($tipos)->flatten()->all();
 
         return $query->whereIn('tipo', $tipos);
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => SiteSettings::forget());
+        static::deleted(fn () => SiteSettings::forget());
+    }
+
+    public function publicRouteName(): string
+    {
+        return match ($this->tipo) {
+            'paquete' => 'paquetesdetalle',
+            'caminata', 'treks' => 'caminatadetalle',
+            default => 'toursdetalle',
+        };
+    }
+
+    public function publicUrl(): string
+    {
+        return route($this->publicRouteName(), $this->slug);
     }
 
     public function seoTitle(): string

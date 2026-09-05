@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Services\SiteSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
-class carrusel extends Model
+class Carrusel extends Model
 {
     use HasFactory;
-    protected $table = 'carrusel';
 
-    protected $primaryKey = 'id';
+    protected $table = 'carrusel';
 
     protected $fillable = [
         'tipo',
@@ -19,9 +20,39 @@ class carrusel extends Model
         'subtitulo',
         'texto',
         'boton',
-        'created_at',
-        'updated_at'
     ];
 
-    protected $dates = ['created_at', 'updated_at'];
+    protected static function booted(): void
+    {
+        static::saved(fn () => SiteSettings::forget());
+        static::deleted(fn () => SiteSettings::forget());
+    }
+
+    public function isVideo(): bool
+    {
+        if ($this->tipo === 'video') {
+            return true;
+        }
+
+        return (bool) preg_match('/\.(mp4|webm|mov|avi)(\?|$)/i', (string) $this->url);
+    }
+
+    public function mediaUrl(): string
+    {
+        $url = trim((string) $this->url);
+
+        if ($url === '') {
+            return '';
+        }
+
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        if (str_contains($url, '/')) {
+            return Storage::url($url);
+        }
+
+        return Storage::url('carrusel/'.$url);
+    }
 }
