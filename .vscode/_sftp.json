@@ -1,0 +1,12 @@
+{
+    "name": "Hostinger",
+    "host": "ftp.voyagesmagiquesperou.com",
+    "protocol": "ftp",
+    "port": 21,
+    "username": "u140453011.dankirafr",
+    "remotePath": "/",
+    "password": "4ntOny.20",
+    "uploadOnSave": false,
+    "useTempFile": false,
+    "openSsh": false
+}
