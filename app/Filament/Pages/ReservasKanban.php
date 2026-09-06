@@ -76,6 +76,10 @@ class ReservasKanban extends Page
             return;
         }
 
+        if ($reserva->estado === $estado) {
+            return;
+        }
+
         $reserva->estado = $estado;
         $reserva->save();
         ReservaEstado::forget();
